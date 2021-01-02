@@ -1,13 +1,237 @@
+* {
+  box-sizing: border-box;
+}
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: rgb(35,35,45);
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+.noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.interactable {
+  cursor: pointer;
+}
+
+#gridButton, #obstaclesButton, #algorithmButton{
+  border-radius: .25em;
+  border-width: 0;
+}
+
+#gridButton, #obstaclesButton, #algorithmButton:focus{
+  outline: 0;
+}
+
+#gridButton {
+  background-color: rgb(66,218,163);
+  color: rgb(40, 140, 100);
+}
+
+#gridButton:hover {
+  background-color: rgb(80,255,192);
+  color: rgb(27,87,65);
+}
+
+#obstaclesButton {
+  background-color: rgb(223,180,66);
+  color: rgb(140,120,40);
+}
+
+#obstaclesButton:hover {
+  background-color: rgb(255,205,75);
+  color: rgb(83,66,22);
+}
+
+#algorithmButton {
+  background-color: rgb(170,80,193);
+  color: rgb(120, 50, 140);
+}
+
+#algorithmButton:hover {
+  background-color: rgb(225,104,255);
+  color: rgb(70, 32, 80);
+}
+
+#header, #titleButtons {
+  display: flex;
+  align-items: top;
+  width: 100%;
+}
+
+#header {
+  justify-content: space-around;
+  background-color: rgb(54,57,69);
+}
+
+#titleButtons {
+  justify-content: space-between;
+}
+
+#headerContent {
+  width: 100%;
+  margin-top: 20px;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#headerButtons {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+}
+
+.svg {
+  width: 50px;
+  height: 50px;
+}
+
+.svgDiv {
+  padding: 10px;
+  border-radius: 7px;
+}
+
+.tile {
+  width: 50px;
+  height: 50px;
+  background-color: rgb(10,10,10);
+  border-radius: 10px;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pathDot {
+  background-color: rgb(243, 243, 64);
+  border-radius: 50%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+}
+
+p {
+  color: rgb(255,255,255);
+}
+
+.algoTag {
+  font-size: 25px;
+  font-weight: 600;
+  padding: 5px 15px;
+  border-radius: 10px;
+  border-width: 3px;
+  border-style: solid;
+}
+
+.algoTag:focus {
+  outline: none;
+}
+
+#djikstra {
+  background-color: rgb(255, 100, 150);
+  border-color: rgb(255, 100, 150);
+  color: rgb(150, 50, 100);
+}
+
+#aStar {
+  background-color: rgb(100, 150, 255);
+  border-color: rgb(100, 150, 255);
+  color: rgb(50, 100, 150);
+}
+
+#depthFirst {
+  background-color: rgb(243, 243, 64);
+  border-color: rgb(243, 243, 64);
+  color: rgb(150, 150, 20);
+}
+
+#playerFrame {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#speedSlider {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  margin-right: 50px;
+}
+
+#speedSliderTrack {
+  height: 10px;
+  width: 100%;
+  border-radius: 5px;
+  background-color: rgb(35,35,45);
+  display: flex;
+  align-items: center;
+}
+
+#speedSliderTrackFill {
+  height: 10px;
+  border-radius: 5px;
+  background-color: rgb(150,150,150);
+  width: 50%;
+}
+
+#speedSliderHandle {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background-color: rgb(200, 200, 200);
+  cursor: grab;
+  transform: none;
+  -webkit-transform: translate(-50%, -50%);
+  position: absolute;
+  z-index: 1;
+}
+
+#speedSliderAnnotation {
+  margin: 0;
+  padding: 5px 10px;
+  border-radius: 5px;
+  background: rgb(35,35,45);
+  color: white;
+  transform: none;
+  -webkit-transform: translate(-50%, -100%);
+  position: absolute;
+  z-index: 2;
+}
+
+#playPause {
+  /* background-color: rgb(104, 221, 123); */
+  background-color: rgb(48, 131, 59);
+  border-radius: 5px;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+#playSVG, #pauseSVG {
+  height: 40px;
+  width: 40px;
+  margin: 4px;
+  margin-bottom: 0;
 }

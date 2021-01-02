@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="200mm"
+   height="200mm"
+   viewBox="0 0 200 200"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   sodipodi:docname="stop.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#1e1e1e"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.49497475"
+     inkscape:cx="-52.784204"
+     inkscape:cy="342.55227"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:pagecheckerboard="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-97)">
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:56.69291306;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 244.45703,52.839844 53.806641,243.10938 53.537109,512.45898 243.80664,703.10938 513.1582,703.37695 703.80664,513.10938 704.07617,243.75781 513.80664,53.109375 Z m 18.18359,43.435547 233.3086,0.404297 164.6914,165.261722 -0.40429,233.31054 L 494.97461,659.94141 261.66406,659.53711 96.974609,494.27539 97.378906,260.96484 Z"
+       transform="matrix(0.26458333,0,0,0.26458333,0,97)"
+       id="path4533"
+       inkscape:connector-curvature="0" />
+    <path
+       sodipodi:type="star"
+       style="opacity:1;fill:#fffbff;fill-opacity:1;stroke:none;stroke-width:15;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path4586"
+       sodipodi:sides="8"
+       sodipodi:cx="100.22607"
+       sodipodi:cy="197.0412"
+       sodipodi:r1="70.332982"
+       sodipodi:r2="66.631744"
+       sodipodi:arg1="1.1778802"
+       sodipodi:arg2="1.5705793"
+       inkscape:flatsided="true"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m 127.15544,262.01456 -53.830537,0.0117 -38.072198,-38.05567 -0.01168,-53.83054 38.055675,-38.07219 53.830534,-0.0117 38.0722,38.05568 0.0117,53.83053 z"
+       inkscape:transform-center-x="1.2626907e-06"
+       inkscape:transform-center-y="-1.2603615e-06" />
+  </g>
+</svg>
