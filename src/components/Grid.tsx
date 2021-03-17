@@ -28,9 +28,19 @@ const initialRefs: Refs = {
   resetAppContextEnabled: false,
 }
 
+interface State {
+  generalWidth: number;
+}
+
+const initialState: State = {
+  generalWidth: 0
+}
+
 const Grid = () => { //For all things related to the grid
   // --------------REACTY STUFF--------------
   const refs = React.useRef<Refs>(initialRefs)
+
+  const [state, setState] = React.useState<State>(initialState);
 
   const { state: appState, setState: setAppState, refs: appRefs } = React.useContext<AppContextType>(AppContext);
 
@@ -74,6 +84,16 @@ const Grid = () => { //For all things related to the grid
   },[appState.isPlayingSim]) //eslint-disable-line
 
   React.useEffect(() => {
+    renderGridPosition(false);
+  },[state.generalWidth]); //eslint-disable-line
+
+  React.useEffect(() => {
+    window.addEventListener("resize", e => {
+      const pixelInterval = 25;
+      if (Math.floor(window.innerWidth/pixelInterval) !== Math.floor(state.generalWidth/pixelInterval)){
+        setState({...state, generalWidth: pixelInterval*Math.floor(window.innerWidth/pixelInterval)});
+      }
+    });
     refs.current.isInitialRender = false;
   },[]); //eslint-disable-line
 
@@ -84,6 +104,7 @@ const Grid = () => { //For all things related to the grid
     for (const [tileKey, tileValue] of Object.entries(appRefs.simGrids[step])) {
       const tileElement: HTMLElement | null = document.getElementById("tile" + tileKey);
       const innerTileElement: HTMLElement | null = tileElement?.querySelector(".innerTile") as HTMLElement;
+      const tileHighlightT: number = .15/appRefs.playbackSpeed;
       if (innerTileElement) {
         if (tileValue.fill === "empty") {
           innerTileElement.style.height = "0";
@@ -96,20 +117,20 @@ const Grid = () => { //For all things related to the grid
           innerTileElement.style.width = "20px";
           innerTileElement.style.borderRadius = "5px";
           innerTileElement.style.backgroundColor = "rgb(50, 50, 80)";
-          gsap.to(innerTileElement, {height: "50px", width: "50px", borderRadius: "10px", duration: Math.min(.2/appRefs.playbackSpeed, .3)});
+          gsap.to(innerTileElement, {height: "50px", width: "50px", borderRadius: "10px", duration: Math.min(tileHighlightT, .2)});
           setTimeout(() => {
             if (simId !== refs.current.simId) {
               innerTileElement.style.height = "0";
               innerTileElement.style.width = "0";
             }
-          }, Math.min(200/appRefs.playbackSpeed, 300));
+          }, Math.min(1000*tileHighlightT, 200));
         }
       }
     }
     if (step < appRefs.simGrids.length - 1) {
       setTimeout(() => {
         simClock(simId, step + 1);
-      },300/appRefs.playbackSpeed);
+      },200/appRefs.playbackSpeed);
     } else { // sim anims finished
       // animate path
       if (!appRefs.pathHead) { return; }
@@ -150,17 +171,18 @@ const Grid = () => { //For all things related to the grid
           animatePathDots(pathTail, "backward");
         },3000);
       }
-      const animatePathTiles: (pathPointer: PathNode | undefined) => void = (pathPointer) => {
-        if (pathPointer) {
-          const tile: HTMLElement | null = document.getElementById("tile" + pathPointer.tileKey);
-          const innerTile: HTMLElement | null = tile?.querySelector(".innerTile") as HTMLElement;
-          gsap.to(innerTile, {backgroundColor: "rgb(255, 255, 255)", duration: 1});
-          setTimeout(() => {
-            gsap.to(innerTile, {backgroundColor: "rgb(50, 50, 80)", duration: (simId === refs.current.simId ? 1 : 0)});
-          },1000);
-          setTimeout(() => animatePathTiles(pathPointer.next),100);
-        }
-        
+      const animatePathTiles = (pathPointer: PathNode): void => {
+        const tile: HTMLElement | null = document.getElementById("tile" + pathPointer.tileKey);
+        const innerTile: HTMLElement | null = tile?.querySelector(".innerTile") as HTMLElement;
+        gsap.to(innerTile, {backgroundColor: "rgb(150, 150, 200)", duration: 1/appRefs.playbackSpeed});
+        setTimeout(() => {
+          gsap.to(innerTile, {backgroundColor: "rgb(50, 50, 80)", duration: (simId === refs.current.simId ? 1/appRefs.playbackSpeed : 0)});
+        },1000/appRefs.playbackSpeed);
+        setTimeout(() => {
+          if (pathPointer.next) {
+            animatePathTiles(pathPointer.next);
+          }
+        },100/appRefs.playbackSpeed);
       }
       const animatePathDots: (pathPointer: PathNode | undefined, direction: string) => void = (pathPointer, direction) => {
         if (simId !== refs.current.simId) { return; }
@@ -173,6 +195,9 @@ const Grid = () => { //For all things related to the grid
           return;
         }
         const currRC: [number, number] = [parseInt(pathPointer.tileKey.split("x")[0]), parseInt(pathPointer.tileKey.split("x")[1])];
+        const dotExpandT: number = .1/appRefs.playbackSpeed;
+        const dotSpaceT: number = direction === "forward" ? .08/appRefs.playbackSpeed : .04/appRefs.playbackSpeed;
+        const dotCompressT: number = .2/appRefs.playbackSpeed;
         if (pathPointer.prev) {
           const prevRC: [number, number] = [parseInt(pathPointer.prev.tileKey.split("x")[0]), parseInt(pathPointer.prev.tileKey.split("x")[1])];
           let firstDot: HTMLElement | null;
@@ -182,32 +207,44 @@ const Grid = () => { //For all things related to the grid
           else { firstDot = document.getElementById(currRC[0] + "x" + currRC[1] + "x6"); }
           if (firstDot) {
             if (direction === "forward") {
-              gsap.fromTo(firstDot, {width: "0", height: "0", backgroundColor: "rgb(243,243,64)"}, {width: "20px", height: "20px", duration: .1});
-              setTimeout(() => {
-                gsap.to(firstDot, {width: "8px", height: "8px", duration: .2});
-                setTimeout(() => { if (simId !== refs.current.simId) { gsap.to(firstDot, {width: "0", height: "0", duration: 0}); } },200);
-              },100);
+              // fade dot in
+              gsap.fromTo(firstDot, {width: "0", height: "0", backgroundColor: "rgb(243,243,64)"}, {width: "20px", height: "20px", duration: dotExpandT});
+              setTimeout(() => { // dot expand delay
+                gsap.to(firstDot, {width: "8px", height: "8px", duration: dotCompressT});
+                setTimeout(() => { // dot compress delay
+                  // check if simId (clockId) is curr anim id
+                  if (simId !== refs.current.simId) { gsap.to(firstDot, {width: "0", height: "0", duration: 0}); } 
+                },1000*dotCompressT);
+              },1000*dotExpandT);
             } else {
+              // fade dot out
               setTimeout(() => {
-                gsap.to(firstDot, {backgroundColor: "rgba(243, 243, 64, 0)", duration: .2});
-              },200)
+                gsap.to(firstDot, {backgroundColor: "rgba(243, 243, 64, 0)", duration: dotCompressT});
+              },2000*dotSpaceT);
             }
           }
         }
         const midDot: HTMLElement | null = document.getElementById(currRC[0] + "x" + currRC[1] + "x5");
         if (midDot) {
           if (direction === "forward") {
-            setTimeout(() => {
-              gsap.fromTo(midDot, {width: "0", height: "0", backgroundColor: "rgb(243,243,64)"}, {width: "20px", height: "20px", duration: .1});
-              setTimeout(() => {
-                gsap.to(midDot, {width: "8px", height: "8px", duration: .2});
-                setTimeout(() => { if (simId !== refs.current.simId) { gsap.to(midDot, {width: "0", height: "0", duration: 0}); } },200);
-              },100);
-            },100);
+            // fade dot in
+            setTimeout(() => { // space between mid and first delay
+              gsap.fromTo(midDot, {width: "0", height: "0", backgroundColor: "rgb(243,243,64)"}, {width: "20px", height: "20px", duration: dotExpandT});
+              setTimeout(() => { // dot expand delay
+                gsap.to(midDot, {width: "8px", height: "8px", duration: dotCompressT});
+                setTimeout(() => { // dot compress delay
+                  // check if simId (clockId) is curr anim id
+                  if (simId !== refs.current.simId) { 
+                    gsap.to(midDot, {width: "0", height: "0", duration: 0}); 
+                  } 
+                },1000*dotCompressT);
+              },1000*dotExpandT);
+            },1000*dotSpaceT);
           } else {
+            // fade dot out
             setTimeout(() => {
-              gsap.to(midDot, {backgroundColor: "rgb(243, 243, 64, 0)", duration: .2});
-            },100);
+              gsap.to(midDot, {backgroundColor: "rgb(243, 243, 64, 0)", duration: dotCompressT});
+            },1000*dotSpaceT);
           }
         }
         if (pathPointer.next) {
@@ -219,24 +256,29 @@ const Grid = () => { //For all things related to the grid
           else { lastDot = document.getElementById(currRC[0] + "x" + currRC[1] + "x6"); }
           if (lastDot) {
             if (direction === "forward") {
-              setTimeout(() => {
-                gsap.fromTo(lastDot, {width: "0", height: "0", backgroundColor: "rgb(243,243,64)"}, {width: "20px", height: "20px", duration: .1});
-                setTimeout(() => {
-                  gsap.to(lastDot, {width: "8px", height: "8px", duration: .2});
-                  setTimeout(() => { if (simId !== refs.current.simId) { gsap.to(lastDot, {width: "0", height: "0", duration: 0}); } },200);
-                },100);
-              },200);
+              setTimeout(() => { // space between last and first delay
+                gsap.fromTo(lastDot, {width: "0", height: "0", backgroundColor: "rgb(243,243,64)"}, {width: "20px", height: "20px", duration: dotExpandT});
+                setTimeout(() => { // dot expand delay
+                  gsap.to(lastDot, {width: "8px", height: "8px", duration: dotCompressT});
+                  setTimeout(() => { // dot compress delay
+                    if (simId !== refs.current.simId) { 
+                      // check if simId (clockId) is curr anim id
+                      gsap.to(lastDot, {width: "0", height: "0", duration: 0}); 
+                    } 
+                  },1000*dotCompressT);
+                },1000*dotCompressT);
+              },2000*dotSpaceT);
             } else {
-              gsap.to(lastDot, {backgroundColor: "rgb(243, 243, 64, 0)", duration: .2});
+              gsap.to(lastDot, {backgroundColor: "rgb(243, 243, 64, 0)", duration: dotCompressT});
             }
           }
         }
         setTimeout(() => {
           animatePathDots(direction === "forward" ? pathPointer.next : pathPointer.prev, direction);
-        },300);
+        },3000*dotSpaceT);
       }
       animatePathTiles(appRefs.pathHead);
-      setTimeout(() => animatePathDots(appRefs.pathHead, "forward"), 1000);
+      setTimeout(() => animatePathDots(appRefs.pathHead, "forward"), 1000/appRefs.playbackSpeed);
     }
   }
 
@@ -659,9 +701,9 @@ const Grid = () => { //For all things related to the grid
   }
   const gridCols: number = gridBounds[3] - gridBounds[2] + 1;
   const gridRows: number = gridBounds[1] - gridBounds[0] + 1;
-  const canAddCol: boolean = tileSpacePix*(gridCols+1) + 20 < window.innerWidth;
+  const canAddCol: boolean = tileSpacePix*(gridCols+1) + 60 < window.innerWidth;
   const headerHeight: number = Math.min(Math.max(.5*window.innerWidth, 180), 250);
-  const canAddRow: boolean = tileSpacePix*(gridRows+1) + 20 < window.innerHeight - headerHeight;
+  const canAddRow: boolean = tileSpacePix*(gridRows+1) + 60 < window.innerHeight - headerHeight;
   const tiles: JSX.Element[] = []
   let tileBounds: [number, number, number, number] = [...gridBounds];
   if (canAddRow){
@@ -678,7 +720,7 @@ const Grid = () => { //For all things related to the grid
           key={r+"x"+c}
           id={"tile"+r+"x"+c}
           className={"tile"}
-          style={appState.grid[r+"x"+c] ? {} : {backgroundColor: "rgb(35,35,45)"}}
+          style={appState.grid[r+"x"+c] ? {} : {backgroundColor: "rgb(35,35,45)", opacity: 0}}
           onMouseOver={e => tileOver(r+"x"+c)}
           onMouseMove={e => tileOver(r+"x"+c)}
           onMouseLeave={e => tileOut(r+"x"+c)}

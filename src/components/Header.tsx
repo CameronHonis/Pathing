@@ -1,7 +1,7 @@
 import React from "react";
 import gsap from "gsap";
 import { AppContext, AppContextType } from "../App";
-import { aStarSim, djikstraSim, depthFirstSim } from "../Simulators"; //eslint-disable-line
+import { aStarSim, dijkstraSim, depthFirstSim } from "../Simulators"; //eslint-disable-line
 import { Grid } from "../Types";
 
 import BoxSelect from "../svgComponents/BoxSelect";
@@ -40,7 +40,7 @@ const Header = () => {
 
   const [state, setState] = React.useState<InitialState>(initialState);
 
-  const baseFontSize = Math.max(Math.min(35, window.innerWidth/38.66), 0);
+  const baseFontSize = Math.max(Math.min(35, window.innerWidth/38.66), 25);
   const mainDivWidth = Math.min(window.innerWidth/3.25 + 286, window.innerWidth, 600);
   let b1TotalMargin: number;
   if (state.activeTitle === "grid"){
@@ -155,13 +155,13 @@ const Header = () => {
   }
 
   const renderAlgoButtons = () => {
-    const djikstraButton: HTMLElement | null = document.getElementById("djikstra");
+    const dijkstraButton: HTMLElement | null = document.getElementById("dijkstra");
     const aStarButton: HTMLElement | null = document.getElementById("aStar");
     const depthFirstButton: HTMLElement | null = document.getElementById("depthFirst");
-    if (!djikstraButton || !aStarButton || !depthFirstButton) { return; }
-    djikstraButton.style.backgroundColor = appState.currAlgo === "djikstra" ? "rgb(255, 100, 150)" : "rgba(255, 100, 150, .15)";
-    djikstraButton.style.color = appState.currAlgo === "djikstra" ? "rgb(150, 50, 100)" : "rgb(255, 100, 150)";
-    djikstraButton.style.cursor = appState.currAlgo === "djikstra" ? "default" : "pointer";
+    if (!dijkstraButton || !aStarButton || !depthFirstButton) { return; }
+    dijkstraButton.style.backgroundColor = appState.currAlgo === "dijkstra" ? "rgb(255, 100, 150)" : "rgba(255, 100, 150, .15)";
+    dijkstraButton.style.color = appState.currAlgo === "dijkstra" ? "rgb(150, 50, 100)" : "rgb(255, 100, 150)";
+    dijkstraButton.style.cursor = appState.currAlgo === "dijkstra" ? "default" : "pointer";
     aStarButton.style.backgroundColor = appState.currAlgo === "aStar" ? "rgb(100, 150, 255)" : "rgba(100, 150, 255, .15)";
     aStarButton.style.color = appState.currAlgo === "aStar" ? "rgb(50, 100, 150)" : "rgb(100, 150, 255)";
     aStarButton.style.cursor = appState.currAlgo === "aStar" ? "default" : "pointer";
@@ -428,7 +428,7 @@ const Header = () => {
           }
           appRefs.simGrids = [gridCopy];
           appRefs.pathHead = undefined;
-          if (appState.currAlgo === "djikstra" && djikstraSim(appRefs)) {
+          if (appState.currAlgo === "dijkstra" && dijkstraSim(appRefs)) {
             setAppState({...appState, isPlayingSim: true});
           } else if (appState.currAlgo === "aStar" && aStarSim(appRefs)) {
             setAppState({...appState, isPlayingSim: true});
@@ -484,7 +484,7 @@ const Header = () => {
               onMouseEnter={e => svgDivEnter("boxSelect")}
               onMouseLeave={e => svgDivLeave("boxSelect")}
             >
-              <BoxSelect />
+              <BoxSelect baseFontSize={baseFontSize}/>
             </div>
             <div
               id="rowSelect"
@@ -493,7 +493,7 @@ const Header = () => {
               onMouseEnter={e => svgDivEnter("rowSelect")}
               onMouseLeave={e => svgDivLeave("rowSelect")}
             >
-              <RowSelect />
+              <RowSelect baseFontSize={baseFontSize}/>
             </div>
             <div
               id="columnSelect"
@@ -502,7 +502,7 @@ const Header = () => {
               onMouseEnter={e => svgDivEnter("columnSelect")}
               onMouseLeave={e => svgDivLeave("columnSelect")}
             >
-              <ColumnSelect />
+              <ColumnSelect baseFontSize={baseFontSize}/>
             </div>
             </>
           }
@@ -516,7 +516,7 @@ const Header = () => {
               onMouseEnter={e => svgDivEnter("wall")}
               onMouseLeave={e => svgDivLeave("wall")}
             >
-              <Wall />
+              <Wall baseFontSize={baseFontSize}/>
             </div>
             <div
               id="start"
@@ -525,7 +525,7 @@ const Header = () => {
               onMouseEnter={e => svgDivEnter("start")}
               onMouseLeave={e => svgDivLeave("start")}
             >
-              <Flag />
+              <Flag baseFontSize={baseFontSize}/>
             </div>
             <div
               id="target"
@@ -534,7 +534,7 @@ const Header = () => {
               onMouseEnter={e => svgDivEnter("target")}
               onMouseLeave={e => svgDivLeave("target")}
             >
-              <Target />
+              <Target baseFontSize={baseFontSize}/>
             </div>
             </>
           }
@@ -542,18 +542,21 @@ const Header = () => {
             state.activeTitle === "algorithm" &&
             <>
             <button
-              id="djikstra"
+              id="dijkstra"
               className="algoTag"
-              onClick={e => setAppState({...appState, currAlgo: "djikstra"})}
-            >Djikstra</button>
+              style={{fontSize: .7*baseFontSize + "px"}}
+              onClick={e => setAppState({...appState, currAlgo: "dijkstra"})}
+            >Dijkstra</button>
             <button
               id="aStar"
               className="algoTag"
+              style={{fontSize: .7*baseFontSize + "px"}}
               onClick={e => setAppState({...appState, currAlgo: "aStar"})}
             >A*</button>
             <button
               id="depthFirst"
               className="algoTag"
+              style={{fontSize: .7*baseFontSize + "px"}}
               onClick={e => setAppState({...appState, currAlgo: "depthFirst"})}
             >depthFirst</button>
             </>
@@ -566,6 +569,7 @@ const Header = () => {
               <div id="speedSliderTrack" >
                 <div id="speedSliderTrackFill" />
                 <div id="speedSliderHandle"
+                  draggable={true}
                   onDrag={e => speedSliderDrag(e)}
                   onDragEnd={e => speedSliderRelease(e)}
                 />

@@ -2,25 +2,20 @@ import React from "react";
 
 interface Props {
   style?: object;
+  baseFontSize?: number;
 }
 
 const Wall: React.FC<Props> = props => {
   return (
     <svg
-   
-   
-   
-   
    xmlns="http://www.w3.org/2000/svg"
-   
-   
    id="svg8"
    version="1.1"
    viewBox="0 0 200 200"
    height="200mm"
    width="200mm"
    className="svg"
-   style={props.style}
+   style={{...props.style, ...(props.baseFontSize && {width: 1.8*props.baseFontSize, height: 1.8*props.baseFontSize})}}
    >
       
   <g

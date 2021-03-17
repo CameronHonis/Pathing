@@ -2,6 +2,7 @@ import React from "react";
 
 interface Props {
   style?: object;
+  baseFontSize?: number;
 }
 
 const BoxSelect: React.FC<Props> = props => {
@@ -14,6 +15,7 @@ const BoxSelect: React.FC<Props> = props => {
       height="200mm"
       width="200mm"
       className="svg"
+      style={{...props.style, ...(props.baseFontSize && {width: 1.8*props.baseFontSize, height: 1.8*props.baseFontSize})}}
       >  
       <g
         id="layer1"

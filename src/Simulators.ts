@@ -1,11 +1,12 @@
 import { Grid, PathNode } from "./Types";
 import { Refs } from "./App";
 
-export const depthFirstSim: (appRefs: Refs) => boolean = (appRefs) => {
+export const depthFirstSim = (appRefs: Refs): boolean => {
+  console.log("depthFirstSim()");
   if (!appRefs.simGrids.length) { console.warn("appRefs.simGrids.length === 0 | depthFirstSim cancelled"); return false; }
   appRefs.simGrids = [appRefs.simGrids[0]];
   appRefs.pathHead = undefined;
-  const depthFirstRecursive: (tileKeys: string[]) => boolean = (tileKeys) => {
+  const depthFirstRecursive = (tileKeys: string[]): boolean => {
     const lastKey: string = tileKeys[tileKeys.length - 1] || "";
     const lastGrid: Grid = appRefs.simGrids[appRefs.simGrids.length - 1];
     if (!(lastKey in lastGrid)) { return false; }
@@ -45,15 +46,16 @@ export const depthFirstSim: (appRefs: Refs) => boolean = (appRefs) => {
   return false;
 }
 
-export const djikstraSim: (appRefs: Refs) => boolean = (appRefs) => {
-  if (!appRefs.simGrids.length) { console.warn("appRefs.simGrids.length === 0 | djikstraSim cancelled"); return false; }
+export const dijkstraSim = (appRefs: Refs): boolean => {
+  console.log("dijkstraSim()");
+  if (!appRefs.simGrids.length) { console.warn("appRefs.simGrids.length === 0 | dijkstraSim cancelled"); return false; }
   appRefs.simGrids = [appRefs.simGrids[0]];
   appRefs.pathHead = undefined;
   class UnvisitedTileLLNode {
     public tileKey: string;
     public fill: string;
     public prevTileKey?: string;
-    public distance: number = 10; //Number.MAX_SAFE_INTEGER;
+    public distance: number = Number.MAX_SAFE_INTEGER/2;
     public prev?: UnvisitedTileLLNode;
     public next?: UnvisitedTileLLNode;
     public head: UnvisitedTileLLNode = this;
@@ -216,20 +218,51 @@ export const djikstraSim: (appRefs: Refs) => boolean = (appRefs) => {
     }
   }
   if (!nodeHash.head || !nodeHash.head.tail) { return false; }
-  const djikstraRecursive: (nodeHash: {[index: string]: UnvisitedTileLLNode}) => boolean = (nodeHash) => {
-    nodeHash.tail = nodeHash.head.tail;
+  let count: number = 0;
+  const dijkstraRecursive: (nodeHash: {[index: string]: UnvisitedTileLLNode}) => boolean = (nodeHash) => {
     if (!nodeHash.head) { return false; }
+    nodeHash.tail = nodeHash.head.tail;
+    console.log(count + " " + nodeHash.head.tileKey);
+    count++;
+    while (nodeHash.head.fill === "wall") {
+      if (nodeHash.head.next) {
+        nodeHash.head = nodeHash.head.next;
+        nodeHash.head.prev?.remove();
+      } else {
+        return false;
+      }
+    }
     const newGrid: Grid = {};
     for (const [ tileKey, tileValue ] of Object.entries(appRefs.simGrids[appRefs.simGrids.length - 1])) {
       newGrid[tileKey] = {...tileValue};
     }
     appRefs.simGrids.push(newGrid);
     if (nodeHash.head.fill === "target") { // can end early (assumes no shorter route will be found, impossible on grid layout)
+      if (!nodeHash.head.prevTileKey) { // isolates and fixes "last bridge disconnnected" bug
+        const targetRC: [number, number] = [parseInt(nodeHash.head.tileKey.split("x")[0]), parseInt(nodeHash.head.tileKey.split("x")[1])];
+        const targetRightRC: string = targetRC[0] + "x" + (targetRC[1]+1);
+        if (targetRightRC in newGrid && newGrid[targetRightRC].fill === "visited") {
+          nodeHash.head.prevTileKey = targetRC[0] + "x" + (targetRC[1]+1);
+        }
+        const targetLeftRC: string = targetRC[0] + "x" + (targetRC[1]-1);
+        if (targetLeftRC in newGrid && newGrid[targetLeftRC].fill === "visited") {
+          nodeHash.head.prevTileKey = targetRC[0] + "x" + (targetRC[1]-1);
+        }
+        const targetDownRC: string = (targetRC[0]+1) + "x" + targetRC[1];
+        if (targetDownRC in newGrid && newGrid[targetDownRC].fill === "visited") {
+          nodeHash.head.prevTileKey = (targetRC[0]+1) + "x" + targetRC[1];
+        }
+        const targetUpRC: string = (targetRC[0]-1) + "x" + targetRC[1];
+        if (targetUpRC in newGrid && newGrid[targetUpRC].fill === "visited") {
+          nodeHash.head.prevTileKey = (targetRC[0]-1) + "x" + targetRC[1];
+        }
+      }
       appRefs.pathHead = {tileKey: nodeHash.head.tileKey};
       while (nodeHash[appRefs.pathHead.tileKey] && nodeHash[appRefs.pathHead.tileKey].prevTileKey) {
         appRefs.pathHead = {tileKey: (nodeHash[appRefs.pathHead.tileKey].prevTileKey || ""), next: appRefs.pathHead};
         if (appRefs.pathHead.next) { appRefs.pathHead.next.prev = appRefs.pathHead; }
       }
+      console.log(nodeHash);
       return true;
     } else {
       newGrid[nodeHash.head.tileKey].fill = "visited";
@@ -257,16 +290,17 @@ export const djikstraSim: (appRefs: Refs) => boolean = (appRefs) => {
       if (nodeHash.head.next) {
         nodeHash.head = nodeHash.head.next;
         nodeHash.head.prev?.remove();
-        return djikstraRecursive(nodeHash);
+        return dijkstraRecursive(nodeHash);
       } else {
         return false;
       }
     }
   }
-  return djikstraRecursive(nodeHash);
+  return dijkstraRecursive(nodeHash);
 }
 
-export const aStarSim: (appRefs: Refs) => boolean = (appRefs) => {
+export const aStarSim = (appRefs: Refs): boolean => {
+  console.log("aStarSim()");
   if (!appRefs.simGrids.length) { console.warn("appRefs.simGrids.length === 0 | aStarSim cancelled"); return false; }
   appRefs.simGrids = [appRefs.simGrids[0]];
   appRefs.pathHead = undefined;
@@ -348,6 +382,12 @@ export const aStarSim: (appRefs: Refs) => boolean = (appRefs) => {
         const newPathNode: PathNode = {tileKey: newPathTileKey, next: appRefs.pathHead};
         appRefs.pathHead.prev = newPathNode;
         appRefs.pathHead = newPathNode;
+      }
+      console.log("found path:\n  " + appRefs.pathHead.tileKey);
+      let pathPointer = appRefs.pathHead;
+      while (pathPointer.next) {
+        pathPointer = pathPointer.next;
+        console.log("  " + pathPointer.tileKey);
       }
       return true;
     }

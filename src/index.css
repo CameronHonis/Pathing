@@ -101,11 +101,6 @@ code {
   justify-content: space-around;
 }
 
-.svg {
-  width: 50px;
-  height: 50px;
-}
-
 .svgDiv {
   padding: 10px;
   border-radius: 7px;
@@ -149,7 +144,7 @@ p {
   outline: none;
 }
 
-#djikstra {
+#dijkstra {
   background-color: rgb(255, 100, 150);
   border-color: rgb(255, 100, 150);
   color: rgb(150, 50, 100);
@@ -222,8 +217,7 @@ p {
 }
 
 #playPause {
-  /* background-color: rgb(104, 221, 123); */
-  background-color: rgb(48, 131, 59);
+  background-color: rgb(60, 200, 80);
   border-radius: 5px;
   padding: 0 10px;
   cursor: pointer;
