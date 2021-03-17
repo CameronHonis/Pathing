@@ -4,9 +4,16 @@ import "./index.css";
 import { App } from "./App";
 
 ReactDOM.render(
-    <App />,
+  <App />,
   document.getElementById("root")
 );
+
+document.addEventListener("keyup", e => {
+  if (e.key.toLowerCase() === "q") {
+    debugger;
+  }
+})
+
 /*
 ----INITIAL CONCEPT FRAMEWORK----
   Actions:
@@ -17,7 +24,7 @@ ReactDOM.render(
     -Change position of start point
     -Add endpoint(s)
     -Change position of endpoint(s)
-    -Select algorithm (default djikstras)
+    -Select algorithm (default dijkstras)
     -Select sim speed
     -Play sim
 
@@ -67,7 +74,7 @@ ReactDOM.render(
     -return w/ jsx
 
   ALGORITHMS:
-    -djikstra
+    -dijkstra
     -a*
     -greedy best-first
     -swarm
@@ -78,10 +85,23 @@ ReactDOM.render(
 
   TODOS:
     -in grid component, pass row, col ints instead of string
-    -transfer some app context state values to a ref instead. to reduce number of rerenders
+    //-transfer some app context state values to a ref instead. to reduce number of rerenders
     -add keybinding for tools
     -consider adding "compacting" code for when editing the grid
-    -consider adding general func to change SVG color
+    -//consider adding general func to change SVG color
+    -//fix dijkstra algo going thru walls
+    -cursor pointer for grid and obstacle tools
+    -algo buttons mouse enter/leave feedback
+    -fix slider "dust off" bug
+    -change found path highlight color to light blue
+    -path dots decay faster
+    -//change default grid size to be based on screen size
+    -add preset grid patterns
+    -rename title
+    -create favicon
+    -fix grid position update on window size change
+    -add boxshadows for unselected algo tags
+    -add tutorial/instructions to help improve UX
 
 
 

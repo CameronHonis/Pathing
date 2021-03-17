@@ -25,23 +25,44 @@ export interface State {
 
 const initialState: State = {
   currTool: "boxSelect",
-  currAlgo: "djikstra",
-  grid: {
-    "0x0": {fill: "start"}, "1x0": {fill: "empty"}, "2x0": {fill: "empty"}, "3x0": {fill: "empty"},
-    "4x0": {fill: "empty"}, "0x1": {fill: "empty"}, "1x1": {fill: "empty"}, "2x1": {fill: "empty"},
-    "3x1": {fill: "empty"}, "4x1": {fill: "empty"}, "0x2": {fill: "empty"}, "1x2": {fill: "empty"},
-    "2x2": {fill: "empty"}, "3x2": {fill: "empty"}, "4x2": {fill: "empty"}, "0x3": {fill: "empty"},
-    "1x3": {fill: "empty"}, "2x3": {fill: "empty"}, "3x3": {fill: "empty"}, "4x3": {fill: "empty"},
-    "0x4": {fill: "empty"}, "1x4": {fill: "empty"}, "2x4": {fill: "empty"}, "3x4": {fill: "empty"},
-    "4x4": {fill: "target"},
-  },
-  gridBounds: [0, 4, 0, 4],
+  currAlgo: "dijkstra",
+  grid: {},
+  gridBounds: [0, 0, 0, 0],
   isPlayingSim: false,
 }
 
+let tilesWide: number;
+if (window.innerWidth > 1200) {
+  tilesWide = 15;
+} else if (window.innerWidth > 800) {
+  tilesWide = 9;
+} else if (window.innerWidth > 600) {
+  tilesWide = 7;
+} else { tilesWide = 5; }
+
+let tilesTall: number;
+if (window.innerHeight > 950) {
+  tilesTall = 9;
+} else if (window.innerHeight > 750) {
+  tilesTall = 7;
+} else if (window.innerHeight > 550) {
+  tilesTall = 5;
+} else {
+  tilesTall = 3;
+}
+
+for (let r: number = 0; r < tilesTall; r++) {
+  for (let c: number = 0; c < tilesWide; c++) {
+    initialState.grid[r+"x"+c] = {fill: "empty"};
+  }
+}
+initialState.grid["0x0"] = {fill: "start"};
+initialState.grid[(tilesTall-1) + "x" + (tilesWide-1)] = {fill: "target"};
+initialState.gridBounds = [0, tilesTall-1, 0, tilesWide-1];
+
 export interface AppContextType {
-  refs: Refs,
-  state: State,
+  refs: Refs;
+  state: State;
   setState: React.Dispatch<React.SetStateAction<State>>;
 }
 

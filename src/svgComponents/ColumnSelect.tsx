@@ -2,6 +2,7 @@ import React from "react"
 
 interface Props {
   style?: object;
+  baseFontSize?: number;
 }
 
 const ColumnSelect: React.FC<Props> = props => {
@@ -14,7 +15,7 @@ const ColumnSelect: React.FC<Props> = props => {
       version="1.1"
       id="svg8"
       className="svg"
-      style={props.style}
+      style={{...props.style, ...(props.baseFontSize && {width: 1.8*props.baseFontSize, height: 1.8*props.baseFontSize})}}
     >
       <defs
         id="defs2" />
