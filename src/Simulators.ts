@@ -108,11 +108,9 @@ export const dijkstraSim = (appRefs: Refs): boolean => {
     public remove(): [removedNode: UnvisitedTileLLNode, lastNode: boolean] {
       if (!this.prev && !this.next) { return [this, true]; }
       if (this.tail === this && this.prev) {
-        console.log("remove tail");
         this.prev.next = undefined;
         this.prev.iterativeSetTail(this.prev);
       } else if (this.head === this && this.next) {
-        console.log("remove head");
         this.next.prev = undefined;
         this.next.iterativeSetHead(this.next);
       } else {
