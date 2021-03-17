@@ -2,7 +2,6 @@ import { Grid, PathNode } from "./Types";
 import { Refs } from "./App";
 
 export const depthFirstSim: (appRefs: Refs) => boolean = (appRefs) => {
-  console.log("depthFirstSim()");
   if (!appRefs.simGrids.length) { console.warn("appRefs.simGrids.length === 0 | depthFirstSim cancelled"); return false; }
   appRefs.simGrids = [appRefs.simGrids[0]];
   appRefs.pathHead = undefined;
@@ -47,7 +46,6 @@ export const depthFirstSim: (appRefs: Refs) => boolean = (appRefs) => {
 }
 
 export const djikstraSim: (appRefs: Refs) => boolean = (appRefs) => {
-  console.log("djikstraSim()");
   if (!appRefs.simGrids.length) { console.warn("appRefs.simGrids.length === 0 | djikstraSim cancelled"); return false; }
   appRefs.simGrids = [appRefs.simGrids[0]];
   appRefs.pathHead = undefined;
@@ -108,11 +106,9 @@ export const djikstraSim: (appRefs: Refs) => boolean = (appRefs) => {
     public remove(): [removedNode: UnvisitedTileLLNode, lastNode: boolean] {
       if (!this.prev && !this.next) { return [this, true]; }
       if (this.tail === this && this.prev) {
-        console.log("remove tail");
         this.prev.next = undefined;
         this.prev.iterativeSetTail(this.prev);
       } else if (this.head === this && this.next) {
-        console.log("remove head");
         this.next.prev = undefined;
         this.next.iterativeSetHead(this.next);
       } else {
@@ -271,7 +267,6 @@ export const djikstraSim: (appRefs: Refs) => boolean = (appRefs) => {
 }
 
 export const aStarSim: (appRefs: Refs) => boolean = (appRefs) => {
-  console.log("aStarSim()");
   if (!appRefs.simGrids.length) { console.warn("appRefs.simGrids.length === 0 | aStarSim cancelled"); return false; }
   appRefs.simGrids = [appRefs.simGrids[0]];
   appRefs.pathHead = undefined;
@@ -353,14 +348,6 @@ export const aStarSim: (appRefs: Refs) => boolean = (appRefs) => {
         const newPathNode: PathNode = {tileKey: newPathTileKey, next: appRefs.pathHead};
         appRefs.pathHead.prev = newPathNode;
         appRefs.pathHead = newPathNode;
-      }
-      if (true) {
-        console.log("found path:\n  " + appRefs.pathHead.tileKey);
-        let pathPointer = appRefs.pathHead;
-        while (pathPointer.next) {
-          pathPointer = pathPointer.next;
-          console.log("  " + pathPointer.tileKey);
-        }
       }
       return true;
     }

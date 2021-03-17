@@ -734,7 +734,6 @@ const Grid = () => { //For all things related to the grid
     pathPointer = pathPointer.next;
   }
 
-  console.log("GRID RERENDER");
   return(
     <div id="grid">
       {tiles}
