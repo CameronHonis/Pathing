@@ -199,7 +199,6 @@ const Header = () => {
   }
 
   const renderSpeedSlider = () => {
-    //console.log("playbackSpeed: " + appRefs.playbackSpeed);
     const speedSlider: HTMLElement | null = document.getElementById("speedSlider");
     const sliderTrack: HTMLElement | null = document.getElementById("speedSliderTrack");
     const sliderFill: HTMLElement | null = document.getElementById("speedSliderTrackFill");
