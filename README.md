@@ -1,20 +1,20 @@
 # Welcome to pathing, an interactive pathfinding algorithm sandbox.
 
-How to start:
+## How to start:
 
-### 1. Build your template (Grid editor)
-A. Use the "box-select" tool to add/remove individual tiles in the grid.
-B. Use the "row-select" tool to add/remove full rows of tiles in the grid.
+### `1. Build your template (Grid editor)`
+A. Use the "box-select" tool to add/remove individual tiles in the grid.\
+B. Use the "row-select" tool to add/remove full rows of tiles in the grid.\
 C. Use the "column-select" tool to add/remove full columns of tiles in the grid.
   
-### 2. Throw the algorithm a curve-ball. (Obstacle editor)
-A. Use the "wall" tool to add/remove walls that exist on grid tiles and block paths
-B. Use the "start-flag" tool to change the starting position.
+### `2. Throw the algorithm a curve-ball. (Obstacle editor)`
+A. Use the "wall" tool to add/remove walls that exist on grid tiles and block paths.\
+B. Use the "start-flag" tool to change the starting position.\
 C. Use the "target-flag" tool to add/remove target positions.
   
-### 3. Pick your poison. (Algorithm selection)
-A. Pick the algorithm you wish to use to solve for the shortest path to a target.
-B. Use the speed slider to choose the playback speed of the algorithm simulation.
+### `3. Pick your poison. (Algorithm selection)`
+A. Pick the algorithm you wish to use to solve for the shortest path to a target.\
+B. Use the speed slider to choose the playback speed of the algorithm simulation.\
 C. Hit play and watch the magic happen!
 
 
