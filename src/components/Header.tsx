@@ -1,10 +1,10 @@
 import React from "react";
 import gsap from "gsap";
 import { AppContext, AppContextType } from "../App";
-import { aStarSearch, aStarSearch2 } from "../services/aStarSearch";
+import { aStarSearch2 } from "../services/aStarSearch";
 import { dijkstraSearch } from "../services/dijkstraSearch";
 import { depthFirstSearch } from "../services/depthFirstSearch";
-import { Grid, Tile } from "../Types";
+import { Grid } from "../Types";
 
 import BoxSelect from "../svgComponents/BoxSelect";
 import RowSelect from "../svgComponents/RowSelect";
