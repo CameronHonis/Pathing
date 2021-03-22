@@ -1,5 +1,7 @@
 * {
   box-sizing: border-box;
+  overflow: hidden;
+  user-select: none;
 }
 body {
   margin: 0;
@@ -101,16 +103,28 @@ code {
   justify-content: space-around;
 }
 
+#actions {
+  width: 25%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 .svgDiv {
   padding: 10px;
   border-radius: 7px;
 }
 
-.tile {
+.obstacleSVGDiv {
+  margin-top: 10px;
+}
+
+.tile, .tile2 {
   width: 50px;
   height: 50px;
   background-color: rgb(10,10,10);
-  border-radius: 10px;
+  border-radius: 20%;
   position: absolute;
   transform: translate(-50%, -50%);
   -webkit-transform: translate(-50%, -50%);
@@ -119,12 +133,46 @@ code {
   align-items: center;
 }
 
+.tile2 {
+  border-radius: 20%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tileInner, .innerTile2 {
+  border-radius: 20%;
+  pointer-events: none;
+}
+
+.tileSVG {
+  width: 35px;
+  height: 35px;
+  pointer-events: none;
+  position: absolute;
+  transform: translate(-50%,-50%);
+  left: 50%;
+  top: 50%;
+}
+
 .pathDot {
   background-color: rgb(243, 243, 64);
   border-radius: 50%;
   position: absolute;
   transform: translate(-50%, -50%);
   -webkit-transform: translate(-50%, -50%);
+}
+
+.pathDot2 {
+  background-color: rgba(255,255,100,0);
+  width: 14%;
+  height: 14%;
+  border-radius: 50%;
+  position: absolute;
+  transform: translate(-50%, -50%);
 }
 
 p {
@@ -228,4 +276,21 @@ p {
   width: 40px;
   margin: 4px;
   margin-bottom: 0;
+}
+
+#clear {
+  background-color: rgba(255,255,255,.3);
+  border-color: rgba(255,255,255,1);
+  color: rgba(255,255,255,1);
+  width: 100%;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+#maze {
+  background-color: rgba(50,50,255,.3);
+  border-color: rgba(50,100,255,1);
+  color: rgba(50,150,255,1);
+  width: 100%;
+  cursor: pointer;
 }

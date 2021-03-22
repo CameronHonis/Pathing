@@ -645,7 +645,19 @@ const Grid = () => { //For all things related to the grid
           }
           setAppState({...appState, grid: tempGrid});
         }
-      } else if (appState.currTool === "start" || appState.currTool === "target"){
+      } else if (appState.currTool === "start") {
+        if (!tileInteractable(tileR, tileC)) return;
+        if (!appState.grid[tileName]) { return; }
+        if (appState.grid[tileName].fill === "start") return;
+        const tempGrid: AppState["grid"] = {...appState.grid};
+        for (const [tempKey, { fill }] of Object.entries(tempGrid)) {
+          if (fill === "start") {
+            tempGrid[tempKey].fill = "empty";
+          }
+        }
+        tempGrid[tileName].fill = appState.currTool;
+        setAppState({...appState, grid: tempGrid});
+      } else if (appState.currTool === "target"){
         if (!tileInteractable(tileR, tileC)) return;
         if (!appState.grid[tileName]) return;
         const tempGrid: AppState["grid"] = {...appState.grid};
@@ -668,7 +680,7 @@ const Grid = () => { //For all things related to the grid
         tile.style.backgroundColor = "rgb(50, 255, 150)";
         gsap.to(tile, {backgroundColor: "rgb(10, 10, 10)", duration: .25});
       }
-      tempGrid[tileNames[i]] = {fill: "empty"};
+      //tempGrid[tileNames[i]] = {fill: "empty"};
     }
     setAppState({...appState, grid: tempGrid});
   }
