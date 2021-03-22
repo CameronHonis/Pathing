@@ -3,7 +3,7 @@ export enum TileFill {
 }
 
 export interface Tile {
-  fill: string; //todo: replace string type w TileFill enum type
+  fill: "start" | "target" | "wall" | "empty" | "visited";
 }
 
 export interface Grid {

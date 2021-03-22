@@ -3,6 +3,7 @@ import React from "react";
 interface Props {
   style?: object;
   baseFontSize?: number;
+  className?: string;
 }
 
 const Target: React.FC<Props> = (props) => {
@@ -14,7 +15,7 @@ const Target: React.FC<Props> = (props) => {
       viewBox="0 0 210 210"
       version="1.1"
       id="svg8"
-      className="svg"
+      className={props.className || "svg"}
       style={{...props.style, ...(props.baseFontSize && {width: 1.8*props.baseFontSize, height: 1.8*props.baseFontSize})}}
       >
       <g

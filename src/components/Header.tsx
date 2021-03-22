@@ -1,8 +1,10 @@
 import React from "react";
 import gsap from "gsap";
 import { AppContext, AppContextType } from "../App";
-import { aStarSim, dijkstraSim, depthFirstSim } from "../Simulators"; //eslint-disable-line
-import { Grid } from "../Types";
+import { aStarSearch, aStarSearch2 } from "../services/aStarSearch";
+import { dijkstraSearch } from "../services/dijkstraSearch";
+import { depthFirstSearch } from "../services/depthFirstSearch";
+import { Grid, Tile } from "../Types";
 
 import BoxSelect from "../svgComponents/BoxSelect";
 import RowSelect from "../svgComponents/RowSelect";
@@ -12,6 +14,8 @@ import Flag from "../svgComponents/Flag";
 import Target from "../svgComponents/Target";
 import Play from "../svgComponents/Play";
 import Stop from "../svgComponents/Stop";
+import { generateMaze } from "../services/generateMaze";
+import { clearGrid } from "../services/clearGrid";
 
 const gridTextRatio: number = 1.83;
 const obstaclesTextRatio: number = 4.45;
@@ -23,22 +27,43 @@ enum SliderState {
   Snapping,
 }
 
-interface InitialState {
+interface HeaderState {
   generalWidth: number;
   activeTitle: string;
   speedSliderState: SliderState;
 }
 
-const initialState: InitialState = {
+const initHeaderState: HeaderState = {
   generalWidth: 0,
   activeTitle: "grid",
-  speedSliderState: SliderState.Idle
+  speedSliderState: SliderState.Idle,
+}
+
+enum ActionType {
+  SetGeneralWidth,
+  SetActiveTitle,
+  SetSpeedSliderState,
+}
+
+interface HeaderStateDispatchAction {
+  type: ActionType;
+  data?: any;
+}
+
+// required to not reset state to init every window resize
+const headerStateDispatch = (last: HeaderState, action: HeaderStateDispatchAction): HeaderState => {
+  if (action.type === ActionType.SetGeneralWidth && typeof action.data === "number") {
+    return {...last, generalWidth: action.data};
+  } else if (action.type === ActionType.SetActiveTitle && typeof action.data === "string") {
+    return {...last, activeTitle: action.data};
+  } else if (action.type === ActionType.SetSpeedSliderState && action.data in SliderState) {
+    return {...last, speedSliderState: action.data};
+  } else { throw new Error(); }
 }
 
 const Header = () => {
   const {refs: appRefs, state: appState, setState: setAppState} = React.useContext<AppContextType>(AppContext);
-
-  const [state, setState] = React.useState<InitialState>(initialState);
+  const [ state, stateDispatch ] = React.useReducer(headerStateDispatch, initHeaderState);
 
   const baseFontSize = Math.max(Math.min(35, window.innerWidth/38.66), 25);
   const mainDivWidth = Math.min(window.innerWidth/3.25 + 286, window.innerWidth, 600);
@@ -109,12 +134,14 @@ const Header = () => {
   };
 
   const renderToolDivs = () => {
+    // loop and set unselected styles for all tools
     const svgDivAll = document.querySelectorAll(".svgDiv");
     for (let i = 0; i < svgDivAll.length; i++){
       gsap.to(svgDivAll[i], {
         backgroundColor: "rgb(45, 45, 60)",
         duration: 0
       });
+      (svgDivAll[i] as HTMLDivElement).style.cursor = "pointer";
       const svgToolStrokeAll = svgDivAll[i].querySelectorAll(".svgToolStroke");
       const svgToolFillAll = svgDivAll[i].querySelectorAll(".svgToolFill");
       for (let j = 0; j < svgToolStrokeAll.length; j++){
@@ -124,12 +151,13 @@ const Header = () => {
         });
       }
       for (let j = 0; j < svgToolFillAll.length; j++){
-        gsap.to(svgToolFillAll, {
+        gsap.to(svgToolFillAll[j], {
           fill: "rgb(150,150,150)",
           duration: 0
         });
       }
     }
+    // override loop styling for selected tool
     const clickDiv = document.getElementById(appState.currTool);
     if (clickDiv){
       gsap.to(clickDiv, {
@@ -201,7 +229,7 @@ const Header = () => {
     if (prevSpeedSliderState !== SliderState.Idle) {
       setTimeout(() => {
         if (prevSpeedSliderState === state.speedSliderState) {
-          setState({...state, speedSliderState: SliderState.Idle});
+          stateDispatch({type: ActionType.SetSpeedSliderState, data: SliderState.Idle});
         }
       }, 500);
     }
@@ -264,7 +292,7 @@ const Header = () => {
     window.addEventListener("resize", e => {
       const pixelInterval = 25;
       if (Math.floor(window.innerWidth/pixelInterval) !== Math.floor(state.generalWidth/pixelInterval)){
-        setState({...state, generalWidth: pixelInterval*Math.floor(window.innerWidth/pixelInterval)});
+        stateDispatch({type: ActionType.SetGeneralWidth, data: pixelInterval*Math.floor(window.innerWidth/pixelInterval)});
       }
     });
     renderHeader();
@@ -362,7 +390,7 @@ const Header = () => {
 
   const speedSliderDrag = (e: React.DragEvent) => {
     if (e.clientX === 0) { return; }
-    setState({...state, speedSliderState: SliderState.Dragging});
+    stateDispatch({type: ActionType.SetSpeedSliderState, data: SliderState.Dragging});
     const sliderTrack: HTMLElement | null = document.getElementById("speedSliderTrack");
     const sliderHandle: HTMLElement | null = document.getElementById("speedSliderHandle");
     const sliderFill: HTMLElement | null = document.getElementById("speedSliderTrackFill");
@@ -398,7 +426,7 @@ const Header = () => {
     } else {
       appRefs.playbackSpeed = -1/(4*sliderSnapPos - 3);
     }
-    setState({...state, speedSliderState: SliderState.Snapping});
+    stateDispatch({type: ActionType.SetSpeedSliderState, data: SliderState.Snapping});
   }
 
   const playPauseEnter = () => {
@@ -412,7 +440,7 @@ const Header = () => {
     }
   }
 
-  const playPauseClick = () => {
+  const playPauseClick = (): void => {
     if (appState.isPlayingSim) {
       setAppState({...appState, isPlayingSim: false});
     } else {
@@ -428,11 +456,11 @@ const Header = () => {
           }
           appRefs.simGrids = [gridCopy];
           appRefs.pathHead = undefined;
-          if (appState.currAlgo === "dijkstra" && dijkstraSim(appRefs)) {
+          if (appState.currAlgo === "dijkstra" && dijkstraSearch(appRefs)) {
             setAppState({...appState, isPlayingSim: true});
-          } else if (appState.currAlgo === "aStar" && aStarSim(appRefs)) {
+          } else if (appState.currAlgo === "aStar" && aStarSearch2(appRefs)) {
             setAppState({...appState, isPlayingSim: true});
-          } else if (appState.currAlgo === "depthFirst" && depthFirstSim(appRefs)) {
+          } else if (appState.currAlgo === "depthFirst" && depthFirstSearch(appRefs)) {
             setAppState({...appState, isPlayingSim: true});
           }
           break;
@@ -447,28 +475,31 @@ const Header = () => {
         <div id="titleButtons">
           <button
             id="gridButton"
+            className="noselect"
             name="grid"
             onMouseEnter={e => titleButtonsEnter("grid")}
             onMouseLeave={e => titleButtonsLeave("grid")}
-            onClick={e => setState({...state, activeTitle: "grid"})}
+            onClick={e => stateDispatch({type: ActionType.SetActiveTitle, data: "grid"})}
           >
             Grid
           </button>
           <button
             id="obstaclesButton"
+            className="noselect"
             name="obstacles"
             onMouseEnter={e => titleButtonsEnter("obstacles")}
             onMouseLeave={e => titleButtonsLeave("obstacles")}
-            onClick={e => setState({...state, activeTitle: "obstacles"})}
+            onClick={e => stateDispatch({type: ActionType.SetActiveTitle, data: "obstacles"})}
           >
             Obstacles
           </button>
           <button
             id="algorithmButton"
+            className="noselect"
             name="algorithm"
             onMouseEnter={e => titleButtonsEnter("algorithm")}
             onMouseLeave={e => titleButtonsLeave("algorithm")}
-            onClick={e => setState({...state, activeTitle: "algorithm"})}
+            onClick={e => stateDispatch({type: ActionType.SetActiveTitle, data: "algorithm"})}
           >
             Algorithm
           </button>
@@ -511,7 +542,7 @@ const Header = () => {
             <>
             <div
               id="wall"
-              className="svgDiv"
+              className="svgDiv obstacleSVGDiv"
               onClick={e => setAppState({...appState, currTool: "wall"})}
               onMouseEnter={e => svgDivEnter("wall")}
               onMouseLeave={e => svgDivLeave("wall")}
@@ -520,7 +551,7 @@ const Header = () => {
             </div>
             <div
               id="start"
-              className="svgDiv"
+              className="svgDiv obstacleSVGDiv"
               onClick={e => setAppState({...appState, currTool: "start"})}
               onMouseEnter={e => svgDivEnter("start")}
               onMouseLeave={e => svgDivLeave("start")}
@@ -529,12 +560,26 @@ const Header = () => {
             </div>
             <div
               id="target"
-              className="svgDiv"
+              className="svgDiv obstacleSVGDiv"
               onClick={e => setAppState({...appState, currTool: "target"})}
               onMouseEnter={e => svgDivEnter("target")}
               onMouseLeave={e => svgDivLeave("target")}
             >
               <Target baseFontSize={baseFontSize}/>
+            </div>
+            <div id="actions">
+              <button
+                id="clear"
+                className="algoTag noselect"
+                style={{fontSize: .7*baseFontSize + "px"}}
+                onClick={e => appState.isPlayingSim ? null : clearGrid(appState, setAppState)}
+              >Clear</button>
+              <button
+                id="maze"
+                className="algoTag noselect"
+                style={{fontSize: .7*baseFontSize + "px"}}
+                onClick={e => appState.isPlayingSim ? null : generateMaze(appState, setAppState)}
+              >Maze</button>
             </div>
             </>
           }
@@ -543,21 +588,21 @@ const Header = () => {
             <>
             <button
               id="dijkstra"
-              className="algoTag"
+              className="algoTag noselect"
               style={{fontSize: .7*baseFontSize + "px"}}
-              onClick={e => setAppState({...appState, currAlgo: "dijkstra"})}
+              onClick={e => appState.isPlayingSim ? null : setAppState({...appState, currAlgo: "dijkstra"})}
             >Dijkstra</button>
             <button
               id="aStar"
-              className="algoTag"
+              className="algoTag noselect"
               style={{fontSize: .7*baseFontSize + "px"}}
-              onClick={e => setAppState({...appState, currAlgo: "aStar"})}
+              onClick={e => appState.isPlayingSim ? null : setAppState({...appState, currAlgo: "aStar"})}
             >A*</button>
             <button
               id="depthFirst"
-              className="algoTag"
+              className="algoTag noselect"
               style={{fontSize: .7*baseFontSize + "px"}}
-              onClick={e => setAppState({...appState, currAlgo: "depthFirst"})}
+              onClick={e => appState.isPlayingSim ? null : setAppState({...appState, currAlgo: "depthFirst"})}
             >depthFirst</button>
             </>
           }
