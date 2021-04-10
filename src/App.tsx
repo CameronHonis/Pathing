@@ -72,7 +72,6 @@ export function App() {
   return (
     <AppContext.Provider value={{refs, state, setState}}>
       <Home />
-      <p style={{position: "absolute", top: "25vh"}}>{window.innerWidth + " " + window.innerHeight}</p>
     </AppContext.Provider>
   );
 }

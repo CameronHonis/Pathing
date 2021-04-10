@@ -220,7 +220,7 @@ const gridRefsReducer = (
             delete newAppGrid[gridRefs.mouseOverTile];
             if (r === newAppGridBounds[0] || r === newAppGridBounds[1] || c === newAppGridBounds[2] || c === newAppGridBounds[3]) {
               newAppGridBounds = [Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER];
-              for (const tileKey of Object.keys(appState.grid)) {
+              for (const tileKey of Object.keys(newAppGrid)) {
                 const [ r0, c0 ]: [number, number] = tileKey.split("x").map(v => +v) as [number, number];
                 newAppGridBounds[0] = Math.min(r0, newAppGridBounds[0]);
                 newAppGridBounds[1] = Math.max(r0, newAppGridBounds[1]);
@@ -239,25 +239,19 @@ const gridRefsReducer = (
           gridRefs.tileRefs[gridRefs.mouseOverTile].inner.current.style.backgroundColor = "rgba(10,10,15,0)";
           setAppState({...appState, grid: newAppGrid, gridBounds: newAppGridBounds});
         } else if (appState.currTool === "rowSelect" || appState.currTool === "columnSelect") {
-          console.log("a");
           const newAppGrid: Grid = Helpers.deepCopy(appState.grid);
           let newAppGridBounds: [number, number, number, number] = Helpers.deepCopy(appState.gridBounds);
           const [ r, c ]: [number, number] = gridRefs.mouseOverTile.split("x").map(v => +v) as [number, number];
           const isInGrid: boolean = gridRefs.mouseOverTile in appState.grid;
           // add/remove tiles
           for (const [ tileKey0, tileRefs ] of Object.entries(gridRefs.tileRefs)) {
-            console.log("b");
             if (tileKey0 in appState.grid !== isInGrid) continue;
             if (!canInteract(appState, tileKey0, gridRefs.targetsCount)) continue;
             const [ r0, c0 ]: [number, number] = tileKey0.split("x").map(v => +v) as [number, number];
-            console.log("c");
             if ((appState.currTool === "rowSelect" && r === r0) || (appState.currTool === "columnSelect" && c === c0)) {
-              console.log("d");
               if (isInGrid) {
-                console.log("e");
                 delete newAppGrid[tileKey0];
-              } else {
-                console.log("f");
+              } else if ((r0 >= appState.gridBounds[0] && r0 <= appState.gridBounds[1]) || (c0 >= appState.gridBounds[2] && c0 <= appState.gridBounds[3])){
                 newAppGrid[tileKey0] = {fill: "empty"};
               }
               if (!tileRefs.inner.current) continue;
@@ -451,7 +445,7 @@ export const Grid2: React.FC<{}> = () => {
           key={tileStr}
           className="tile2"
           ref={gridRefs.tileRefs[tileStr].main}
-          style={{width: tileLength + "px", height: tileLength + "px"}}
+          style={{width: tileLength + "px", height: tileLength + "px", backgroundColor: "rgba(35, 35, 45, 1)"}}
           onMouseOver={e => gridRefsReducer(gridRefs, GridRefsAction.SetMouseOver, [tileStr, true, e.buttons === 1], appState, setAppState)}
           onMouseMove={e => gridRefsReducer(gridRefs, GridRefsAction.SetMouseOver, [tileStr, true, e.buttons === 1], appState, setAppState)}
           onMouseLeave={e => gridRefsReducer(gridRefs, GridRefsAction.SetMouseOver, [tileStr, false, e.buttons === 1], appState, setAppState)}

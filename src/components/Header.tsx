@@ -35,7 +35,7 @@ interface HeaderState {
 
 const initHeaderState: HeaderState = {
   generalWidth: 0,
-  activeTitle: "grid",
+  activeTitle: "obstacles",
   speedSliderState: SliderState.Idle,
 }
 
